@@ -3,9 +3,11 @@ var path = require('path');
 var http2 = require('http2');
 
 function pushFiles(response) {
-  var push = response.push('/static/sample.js');
-  push.writeHead(200);
-  fs.createReadStream(path.join(__dirname, '/static/sample.js')).pipe(push);
+  ['sample.js', 'styles.css'].forEach((v) => {
+    var push = response.push(`/static/${v}`);
+    push.writeHead(200);
+    fs.createReadStream(path.join(__dirname, `/static/${v}`)).pipe(push);
+  });
 }
 
 function handleRoot(request, response) {
@@ -14,7 +16,6 @@ function handleRoot(request, response) {
   if (response.push) {
     pushFiles(response);
   }
-
 
   fs.createReadStream(
     path.join(__dirname, '/static/index.html')).pipe(response);
