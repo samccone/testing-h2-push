@@ -1,0 +1,29 @@
+{
+  "passes": [{
+    "network": true,
+    "trace": true,
+    "loadPage": true,
+    "gatherers": []
+  }],
+
+  "audits": [
+    "first-meaningful-paint",
+    "time-to-interactive",
+    "user-timings"
+  ],
+
+  "aggregations": [{
+    "name": "Performance diagnostics",
+    "description": "",
+    "scored": false,
+    "categorizable": false,
+    "items": [{
+      "criteria": {
+        "user-timings": {
+          "rawValue": 0,
+          "weight": 1
+        }
+      }
+    }]
+  }]
+}
