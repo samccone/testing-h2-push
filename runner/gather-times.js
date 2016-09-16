@@ -47,9 +47,39 @@ function gatherNTmes(
   })
 }
 
-gatherNTmes(
+let outData = {};
+
+function gatherSimplePush() {
+  return gatherNTmes(
     getTiming.bind(null, 'push-simple.html', 'time to run js'),
     SAMPLE_SIZE,
-    SLEEP_TIME_MS).then((results) => {
-  console.log(results);
-});
+    SLEEP_TIME_MS).then(results => outData.pushSimple = results);
+}
+
+function gatherNoSimplePush() {
+  return gatherNTmes(
+      getTiming.bind(null, 'no-push-simple.html', 'time to run js'),
+      SAMPLE_SIZE,
+      SLEEP_TIME_MS).then(results => outData.noPushSimple = results);
+}
+
+gatherSimplePush().then(() => {
+  return gatherNoSimplePush();
+}).then(() => console.log(printCSV(outData))).catch(console.log.bind(console));
+
+function valsAtIndex(obj, index) {
+  return Object.keys(obj).reduce((accum, curr) => {
+    accum.push(obj[curr][index]);
+    return accum;
+  }, []);
+}
+
+function printCSV(obj) {
+  let headers = Object.keys(obj).join(',');
+
+  // assume they all have the same length here..
+  return headers + obj[Object.keys(obj)[0]].reduce((accum, curr, i) => {
+    accum += `\n${valsAtIndex(obj, i).join(',')}`;
+    return accum;
+  }, '');
+}
