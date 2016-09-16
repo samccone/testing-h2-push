@@ -12,18 +12,5 @@
     "user-timings"
   ],
 
-  "aggregations": [{
-    "name": "Performance diagnostics",
-    "description": "",
-    "scored": false,
-    "categorizable": false,
-    "items": [{
-      "criteria": {
-        "user-timings": {
-          "rawValue": 0,
-          "weight": 1
-        }
-      }
-    }]
-  }]
+  "aggregations": []
 }
