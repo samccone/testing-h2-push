@@ -4,7 +4,7 @@ const fs = require('fs');
 const config = JSON.parse(
     fs.readFileSync(path.join(__dirname, 'runner.json'), 'utf8'));
 const root = 'https://localhost:3000/static/';
-const SAMPLE_SIZE = 5;
+const SAMPLE_SIZE = 25;
 const SLEEP_TIME_MS = 50;
 
 function extractTimingDuration(name, timings) {
