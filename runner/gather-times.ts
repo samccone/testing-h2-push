@@ -1,18 +1,21 @@
+/// <reference path="typings/index.d.ts" />
+
 const lighthouse = require('lighthouse');
 const path = require('path');
 const fs = require('fs');
+
 const config = JSON.parse(
     fs.readFileSync(path.join(__dirname, 'runner.json'), 'utf8'));
-const root = 'https://localhost:3000/static/';
-const SAMPLE_SIZE = 25;
-const SLEEP_TIME_MS = 50;
+const root:string = 'https://localhost:3000/static/';
+const SAMPLE_SIZE: number = 9;
+const SLEEP_TIME_MS: number = 50;
 
-function extractTimingDuration(name, timings) {
+function extractTimingDuration(name: string, timings: {extendedInfo: {value: Array<{name: string, duration: number}>}}): number {
   return timings.extendedInfo.value.find(v => {
     return v.name === name}).duration;
 }
 
-function getTiming(url, timingName) {
+function getTiming(url: string, timingName: string): Promise<number> {
   return lighthouse(`${root}/${url}`, {loadPage: true}, config).then((results) => {
     return extractTimingDuration(
         timingName,
@@ -21,12 +24,12 @@ function getTiming(url, timingName) {
 }
 
 function gatherNTmes(
-    gather,
+    gather: () => Promise<number>,
     number,
     sleepBetween=SLEEP_TIME_MS,
-    accumulator=[]) {
+    accumulator=[]): Promise<Array<number>> {
 
-  return gather().then(v => {
+  return gather().then((v) => {
     console.log(`run ${accumulator.length + 1} complete`);
     accumulator.push(v);
 
@@ -47,34 +50,38 @@ function gatherNTmes(
   })
 }
 
-let outData = {};
+let outData:{noPushSimple?: Array<number>, pushSimple?: Array<number>} = {};
 
-function gatherSimplePush() {
+function gatherSimplePush(): Promise<Array<number>> {
   return gatherNTmes(
-    getTiming.bind(null, 'push-simple.html', 'time to run js'),
+    () => getTiming('push-simple.html', 'time to run js'),
     SAMPLE_SIZE,
-    SLEEP_TIME_MS).then(results => outData.pushSimple = results);
+    SLEEP_TIME_MS).then(results => outData.pushSimple = (outData.pushSimple || []).concat(results));
 }
 
-function gatherNoSimplePush() {
+function gatherNoSimplePush(): Promise<Array<number>> {
   return gatherNTmes(
-      getTiming.bind(null, 'no-push-simple.html', 'time to run js'),
+      () => getTiming('no-push-simple.html', 'time to run js'),
       SAMPLE_SIZE,
-      SLEEP_TIME_MS).then(results => outData.noPushSimple = results);
+      SLEEP_TIME_MS).then(results => outData.noPushSimple = (outData.noPushSimple || []).concat(results));
 }
 
 gatherSimplePush().then(() => {
   return gatherNoSimplePush();
+}).then(() => {
+  return gatherNoSimplePush();
+}).then(() => {
+  return gatherSimplePush();
 }).then(() => console.log(printCSV(outData))).catch(console.log.bind(console));
 
-function valsAtIndex(obj, index) {
+function valsAtIndex(obj: Object, index: number): Array<any> {
   return Object.keys(obj).reduce((accum, curr) => {
     accum.push(obj[curr][index]);
     return accum;
   }, []);
 }
 
-function printCSV(obj) {
+function printCSV(obj: Object): string {
   let headers = Object.keys(obj).join(',');
 
   // assume they all have the same length here..
