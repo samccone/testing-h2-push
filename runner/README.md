@@ -8,4 +8,4 @@
 
 Then in a new terminal run:
 
-`node gather-times.js`
+`ts-node gather-times.js`
