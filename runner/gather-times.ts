@@ -1,7 +1,9 @@
 /// <reference path="typings/index.d.ts" />
 
 import printCSV from './to-csv-string';
-import {gatherSimplePush, gatherNoSimplePush} from './simple-testcase';
+import * as simple from './simple-testcase';
+import *  as simpleWebapp from './simple-webapp';
+
 import {getTiming} from './user-timing';
 import {OutData} from './types';
 
@@ -9,9 +11,9 @@ const root:string = 'https://localhost:3000/static/';
 
 let outData:OutData = {};
 
-let boundGetTiming = (url: string, timingName: string) => getTiming(root, url, timingName)
-let boundSimplePush = () => gatherSimplePush(outData, boundGetTiming)
-let boundNoSimplePush = () => gatherNoSimplePush(outData, boundGetTiming)
+let boundGetTiming = (url: string, timingName: string) => getTiming(root, url, timingName);
+let boundSimplePush = () => simple.push(outData, boundGetTiming);
+let boundNoSimplePush = () => simple.noPush(outData, boundGetTiming);
 
 function chainGather(...promises: Array<() => Promise<any>>):Promise<any> {
   return Array.from(arguments).reduce((prev, curr) => {
