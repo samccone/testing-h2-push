@@ -14,8 +14,11 @@ function init() {
   const appView = new AppView();
   appView.render();
 
-  fetch('/static/webapp.json').then(r => r.json()).then(v => {
+  var request = new XMLHttpRequest();
+  request.addEventListener('load', () => {
     performance.mark('data_fetched');
     performance.measure('time to run app boot', undefined, 'data_fetched');
   });
+  request.open('GET', '/static/webapp.json');
+  request.send();
 }
