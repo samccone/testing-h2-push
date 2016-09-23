@@ -17,7 +17,10 @@ function extractTimingDuration(name: string, timings: Timings): number {
 function getTiming(root: string,
                    url: string,
                    timingName: string): Promise<number> {
-  return lighthouse(`${root}/${url}`, {loadPage: true}, config).then((results) => {
+  return lighthouse(`${root}/${url}`, {
+    loadPage: true,
+    pauseAfterLoad: 2000,
+  }, config).then((results) => {
     return extractTimingDuration(
         timingName,
         results.audits['user-timings']);
