@@ -3,6 +3,12 @@ var path = require('path');
 var http = require('http');
 var extractPush = require('./extract-push');
 
+var contentTypes = {
+  '.json': 'json',
+  '.js': 'application/javascript',
+  '.css': 'stylesheet'
+};
+
 function pushFiles(response, toPush) {
   toPush.forEach((v) => {
     var push = response.push(v);
@@ -20,7 +26,7 @@ function handleDocument(request, response) {
   }
 
   let pushFiles = extractPush(fs.readFileSync(indexPath, 'utf8')).then(toPush => {
-    response.setHeader('link', toPush.map(v => `<${v}>; rel=preload`));
+    response.setHeader('link', toPush.map(v => `<${v}>; rel=preload; as=${contentTypes[path.extname(v)]}`));
   }).then(() => {
     fs.createReadStream(indexPath).pipe(response);
   }).catch(e => console.log(e));
