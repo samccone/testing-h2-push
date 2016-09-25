@@ -1,6 +1,6 @@
 var fs = require('fs');
 var path = require('path');
-var http2 = require('http2');
+var http = require('http');
 var extractPush = require('./extract-push');
 var staticPrefix = 'static';
 
@@ -15,14 +15,12 @@ function pushFiles(response, toPush) {
 function handleDocument(request, response) {
   response.setHeader('content-type', 'text/html');
   let indexPath = path.join(__dirname, request.url);
+  let pushFiles = extractPush(
+    fs.readFileSync(indexPath, 'utf8')).then((toPush) => {
+      pushFiles(response, toPush);
+    });
 
-  if (response.push) {
-    extractPush(
-      fs.readFileSync(indexPath, 'utf8')).then((toPush) => {
-        pushFiles(response, toPush);
-      });
-  }
-
+  console.log('should-push');
   fs.createReadStream(indexPath).pipe(response);
 }
 
@@ -33,23 +31,18 @@ function handleStatic(request, response) {
     return;
   }
 
-  if (request.url.startsWith('/static/')) {
-    fs.createReadStream(path.join(__dirname, request.url)).pipe(response);
-    return;
-  }
-
   response.writeHead(404);
   response.end();
 }
 
 function onRequest(request, response) {
-  let fn = request.url.endsWith('.html') ? handleDocument : handleStatic;
-  fn(request, response);
+  console.log(`request ${request.url}`);
+  if (request.url.endsWith('.html')) {
+    fn(request, response);
+  }
 }
 
-server = http2.createServer({
-  key: fs.readFileSync(path.join(__dirname, '/server.key')),
-  cert: fs.readFileSync(path.join(__dirname, '/server.crt'))
-}, onRequest);
+server = http.createServer(onRequest);
 
 server.listen(3000);
+console.log('server started on port 3000');
