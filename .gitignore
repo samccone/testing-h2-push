@@ -5,3 +5,4 @@ node_modules
 .git
 typings
 .DS_Store
+*.log
