@@ -12,8 +12,8 @@ const root:string = 'https://localhost/pages/';
 let outData:OutData = {};
 
 let boundGetTiming = (url: string, timingName: string) => getTiming(root, url, timingName);
-let boundSimplePush = () => simple.push(outData, boundGetTiming);
-let boundNoSimplePush = () => simple.noPush(outData, boundGetTiming);
+let boundSimplePush = () => simpleWebapp.push(outData, boundGetTiming);
+let boundNoSimplePush = () =>simpleWebapp.noPush(outData, boundGetTiming);
 
 function chainGather(...promises: Array<() => Promise<any>>):Promise<any> {
   return Array.from(arguments).reduce((prev, curr) => {
