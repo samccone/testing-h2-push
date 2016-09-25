@@ -3,6 +3,8 @@ var path = require('path');
 var http = require('http');
 var extractPush = require('./extract-push');
 
+// https://w3c.github.io/preload/#link-element-interface-extensions
+// ^ i think these should be the values but they do not work in chrome :(
 var contentTypes = {
   '.json': 'json',
   '.js': 'application/javascript',
