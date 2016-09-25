@@ -7,7 +7,7 @@ import *  as simpleWebapp from './simple-webapp';
 import {getTiming} from './user-timing';
 import {OutData} from './types';
 
-const root:string = 'https://localhost:3000/static/';
+const root:string = 'https://localhost/pages/';
 
 let outData:OutData = {};
 
