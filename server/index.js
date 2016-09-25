@@ -2,7 +2,6 @@ var fs = require('fs');
 var path = require('path');
 var http = require('http');
 var extractPush = require('./extract-push');
-var staticPrefix = 'static';
 
 function pushFiles(response, toPush) {
   toPush.forEach((v) => {
@@ -15,30 +14,22 @@ function pushFiles(response, toPush) {
 function handleDocument(request, response) {
   response.setHeader('content-type', 'text/html');
   let indexPath = path.join(__dirname, request.url);
-  let pushFiles = extractPush(
-    fs.readFileSync(indexPath, 'utf8')).then((toPush) => {
-      pushFiles(response, toPush);
-    });
 
-  console.log('should-push');
-  fs.createReadStream(indexPath).pipe(response);
-}
-
-function handleStatic(request, response) {
   if (request.url === '/') {
-    response.setHeader('content-type', 'text/html');
-    fs.createReadStream(path.join(__dirname, '/static/index.html')).pipe(response);
-    return;
+    indexPath = path.join(__dirname, 'pages/index.html');
   }
 
-  response.writeHead(404);
-  response.end();
+  let pushFiles = extractPush(fs.readFileSync(indexPath, 'utf8')).then(toPush => {
+    response.setHeader('link', toPush.map(v => `<${v}>; rel=preload`));
+  }).then(() => {
+    fs.createReadStream(indexPath).pipe(response);
+  }).catch(e => console.log(e));
 }
 
 function onRequest(request, response) {
   console.log(`request ${request.url}`);
-  if (request.url.endsWith('.html')) {
-    fn(request, response);
+  if (request.url === '/' || request.url.endsWith('.html')) {
+    handleDocument(request, response);
   }
 }
 
